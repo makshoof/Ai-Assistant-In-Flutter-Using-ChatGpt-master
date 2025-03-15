@@ -1,0 +1,38 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
+
+// Apply the toolchain configuration to all subprojects (for Kotlin and Java)
+subprojects {
+    afterEvaluate { project ->
+        project.plugins.withType(org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper) {
+            kotlin {
+                jvmToolchain {
+                    languageVersion.set(JavaLanguageVersion.of(17))  // Set Kotlin to use Java 17
+                }
+            }
+        }
+        project.plugins.withType(JavaPlugin) {
+            java {
+                toolchain {
+                    languageVersion.set(JavaLanguageVersion.of(17))  // Set Java to use Java 17
+                }
+            }
+}
+}
+}
